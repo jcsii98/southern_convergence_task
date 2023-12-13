@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import "./App.css";
+import TodoListItem from "./components/TodoListItem";
+import { v4 as uuidv4 } from "uuid";
 
 function App() {
   // check localstorage for todos
@@ -7,36 +9,41 @@ function App() {
     JSON.parse(localStorage.getItem("todos")) || []
   );
 
-  const displayTodos = todos.map((todo) => (
-    <li key={todo.id} className="text-xl">
-      {todo.task} {todo.completed ? "Completed" : "Pending"}
-    </li>
-  ));
-
-  // set todos
+  // adding todo
   const [todo, setTodo] = useState("");
-
-  const inputChange = (event) => {
-    setTodo(event.target.value);
-  };
 
   const handleSubmit = () => {
     console.log("handleSubmit called!");
     console.log(todo);
 
-    // add todo to todos array
-    setTodos((current) => [
-      ...current,
-      {
-        id: todos.length,
-        task: todo,
-        completed: false,
-      },
-    ]);
+    // check if input is ''
+    if (todo === "") {
+      console.log("Invalid input value");
+    } else {
+      const newId = uuidv4();
 
-    // reset input field
-    setTodo("");
+      // add todo to todos array
+      setTodos((current) => [
+        ...current,
+        {
+          id: newId,
+          task: todo,
+          completed: false,
+        },
+      ]);
+
+      // reset input field
+      setTodo("");
+    }
   };
+
+  const inputChange = (event) => {
+    setTodo(event.target.value);
+  };
+
+  const displayTodos = todos.map((todo) => (
+    <TodoListItem key={todo.id} todo={todo} todos={todos} setTodos={setTodos} />
+  ));
 
   // useEffect to set to localStorage todos whenever todos is updated
   useEffect(() => {
@@ -57,13 +64,13 @@ function App() {
           </h1>
           <div id="main-container" className="w-full flex space-x-4">
             <div className="w-full bg-slate-100 rounded-md p-4">
-              <p className="text-xl font-medium text-slate-600">Tasks</p>
+              <p className="text-xl font-medium text-slate-600 pb-2">Tasks</p>
               <div className="">
                 <ul>{displayTodos}</ul>
               </div>
               {/* map todos here */}
             </div>
-            <div className="w-full bg-slate-100 rounded-md p-4">
+            <div className="max-h-[183px] w-full bg-slate-100 rounded-md p-4">
               <p className="text-xl font-medium text-slate-600 pb-2">
                 Add Task
               </p>
